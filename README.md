@@ -1,3 +1,38 @@
+# ALX Polly
+
+A full-stack polling application built with Next.js, TypeScript, and Supabase. Handles authentication, poll management, voting, and user dashboards.
+
+## Tech Stack
+- Next.js
+- TypeScript
+- Supabase (database & authentication)
+- Tailwind CSS (UI)
+
+## Setup Instructions
+1. Clone the repo:
+    git clone https://github.com/Ettourach/alx-polly.git
+
+2. Install dependencies:
+    npm install
+
+3. Configure Supabase:
+    - Create a Supabase project at https://supabase.com
+    - Get your project URL and anon key
+    - Add them to `.env.local`:
+      NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+      NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+4. Run the app locally:
+    npm run dev
+
+## Usage Examples
+- Create a poll: Go to Dashboard > Create Poll, fill in details, and submit.
+- Vote: Open a poll, select an option, and vote.
+- View results: Dashboard shows poll statistics and voting history.
+
+## Testing
+- To run tests (if available):
+    npm test
 # ALX Polly: A Polling Application
 
 Welcome to ALX Polly, a full-stack polling application built with Next.js, TypeScript, and Supabase. This project serves as a practical learning ground for modern web development concepts, with a special focus on identifying and fixing common security vulnerabilities.
@@ -52,7 +87,7 @@ A good security audit involves both static code analysis and dynamic testing. He
     -   Look for hidden or undocumented features. Are there any pages not linked in the main UI?
 
 2.  **Use Your AI Assistant**:
-    -   This is an open-book test. You are encouraged to use AI tools to help you.
+    -   that s  an open-book test. You are encouraged to use AI tools to help you.
     -   Ask your AI assistant to review snippets of code for security issues.
     -   Describe a feature's behavior to your AI and ask it to identify potential attack vectors.
     -   When you find a vulnerability, ask your AI for the best way to patch it.
