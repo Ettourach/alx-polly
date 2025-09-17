@@ -8,7 +8,7 @@ import { deletePoll } from "@/app/lib/actions/poll-actions";
 interface Poll {
   id: string;
   question: string;
-  options: any[];
+  options: string[];
   user_id: string;
 }
 

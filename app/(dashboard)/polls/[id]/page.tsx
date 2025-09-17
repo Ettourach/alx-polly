@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -22,7 +23,9 @@ const mockPoll = {
   createdBy: 'John Doe',
 };
 
-export default function PollDetailPage({ params }: { params: { id: string } }) {
+export default function PollDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,7 +59,7 @@ export default function PollDetailPage({ params }: { params: { id: string } }) {
         </Link>
         <div className="flex space-x-2">
           <Button variant="outline" asChild>
-            <Link href={`/polls/${params.id}/edit`}>Edit Poll</Link>
+            <Link href={`/polls/${id}/edit`}>Edit Poll</Link>
           </Button>
           <Button variant="outline" className="text-red-500 hover:text-red-700">
             Delete
