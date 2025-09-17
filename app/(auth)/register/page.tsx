@@ -6,35 +6,41 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { register } from '@/app/lib/actions/auth-actions';
+
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
-    const formData = new FormData(event.currentTarget);
-    const name = formData.get('name') as string;
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const confirmPassword = formData.get('confirmPassword') as string;
-
-    if (password !== confirmPassword) {
+    if (form.password !== form.confirmPassword) {
       setError('Passwords do not match');
       setLoading(false);
       return;
     }
-
-    const result = await register({ name, email, password });
-
-    if (result?.error) {
-      setError(result.error);
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: form.name, email: form.email, password: form.password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Registration failed');
+        setLoading(false);
+        return;
+      }
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
+      window.location.href = '/polls';
+    } catch (err) {
+      setError('Registration failed');
       setLoading(false);
-    } else {
-      window.location.href = '/polls'; // Full reload to pick up session
     }
   };
 
@@ -55,6 +61,8 @@ export default function RegisterPage() {
                 type="text" 
                 placeholder="John Doe" 
                 required
+                value={form.name}
+                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
@@ -66,6 +74,8 @@ export default function RegisterPage() {
                 placeholder="your@email.com" 
                 required
                 autoComplete="email"
+                value={form.email}
+                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
@@ -76,6 +86,8 @@ export default function RegisterPage() {
                 type="password" 
                 required
                 autoComplete="new-password"
+                value={form.password}
+                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
@@ -86,6 +98,8 @@ export default function RegisterPage() {
                 type="password" 
                 required
                 autoComplete="new-password"
+                value={form.confirmPassword}
+                onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
               />
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}

@@ -6,28 +6,37 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { login } from '@/app/lib/actions/auth-actions';
+
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ email: '', password: '' });
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
 
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-
-    const result = await login({ email, password });
-
-    if (result?.error) {
-      setError(result.error);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email, password: form.password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Login failed');
+        setLoading(false);
+        return;
+      }
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
+      window.location.href = '/polls';
+    } catch (err) {
+      setError('Login failed');
       setLoading(false);
-    } else {
-      window.location.href = '/polls'; // Full reload to pick up session
     }
   };
 
@@ -49,6 +58,8 @@ export default function LoginPage() {
                 placeholder="your@email.com" 
                 required
                 autoComplete="email"
+                value={form.email}
+                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
@@ -59,6 +70,8 @@ export default function LoginPage() {
                 type="password" 
                 required
                 autoComplete="current-password"
+                value={form.password}
+                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
               />
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
