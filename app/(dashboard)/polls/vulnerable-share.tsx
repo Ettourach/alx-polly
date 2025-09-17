@@ -25,9 +25,11 @@ export default function VulnerableShare({
   const [shareUrl, setShareUrl] = useState("");
 
   useEffect(() => {
-    // Generate the share URL
+    // Generate the share URL with basic validation
+    if (!pollId || typeof pollId !== 'string') return;
+    
     const baseUrl = window.location.origin;
-    const pollUrl = `${baseUrl}/polls/${pollId}`;
+    const pollUrl = `${baseUrl}/polls/${encodeURIComponent(pollId)}`;
     setShareUrl(pollUrl);
   }, [pollId]);
 

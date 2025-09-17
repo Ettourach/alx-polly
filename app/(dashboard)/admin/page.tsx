@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { deletePoll } from "@/app/lib/actions/poll-actions";
-import { createClient } from "@/lib/supabase/client";
+import { getAllPolls, checkAdminAccess } from "@/app/lib/actions/admin-actions";
 
 interface Poll {
   id: string;
@@ -24,21 +25,28 @@ export default function AdminPage() {
   const [polls, setPolls] = useState<Poll[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    fetchAllPolls();
+    checkAuthAndFetchPolls();
   }, []);
 
-  const fetchAllPolls = async () => {
-    const supabase = createClient();
+  const checkAuthAndFetchPolls = async () => {
+    // First check if user has admin access
+    const adminCheck = await checkAdminAccess();
+    if (!adminCheck.isAdmin) {
+      setAuthError(adminCheck.error || "Access denied");
+      setLoading(false);
+      return;
+    }
 
-    const { data, error } = await supabase
-      .from("polls")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (!error && data) {
-      setPolls(data);
+    // If admin, fetch all polls
+    const result = await getAllPolls();
+    if (result.error) {
+      setAuthError(result.error);
+    } else {
+      setPolls(result.polls);
     }
     setLoading(false);
   };
@@ -47,7 +55,9 @@ export default function AdminPage() {
     setDeleteLoading(pollId);
     const result = await deletePoll(pollId);
 
-    if (!result.error) {
+    if (result.error) {
+      alert(`Error: ${result.error}`);
+    } else {
       setPolls(polls.filter((poll) => poll.id !== pollId));
     }
 
@@ -55,7 +65,25 @@ export default function AdminPage() {
   };
 
   if (loading) {
-    return <div className="p-6">Loading all polls...</div>;
+    return <div className="p-6">Loading admin panel...</div>;
+  }
+
+  if (authError) {
+    return (
+      <div className="p-6 text-center">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 inline-block">
+          <h2 className="text-lg font-semibold text-red-800 mb-2">Access Denied</h2>
+          <p className="text-red-600">{authError}</p>
+          <Button 
+            variant="outline" 
+            className="mt-4"
+            onClick={() => router.push('/polls')}
+          >
+            Return to Polls
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
