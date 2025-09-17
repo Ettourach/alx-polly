@@ -18,7 +18,9 @@ A full-stack polling application built with Next.js, TypeScript, and Supabase. H
 3. Configure Supabase:
     - Create a Supabase project at https://supabase.com
     - Get your project URL and anon key
-    - Add them to `.env.local`:
+    - Copy `.env.example` to `.env.local`:
+      cp .env.example .env.local
+    - Edit `.env.local` and add your actual Supabase credentials:
       NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
       NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
@@ -29,6 +31,17 @@ A full-stack polling application built with Next.js, TypeScript, and Supabase. H
 - Create a poll: Go to Dashboard > Create Poll, fill in details, and submit.
 - Vote: Open a poll, select an option, and vote.
 - View results: Dashboard shows poll statistics and voting history.
+
+## Security Features
+
+This application includes several security measures:
+
+- **Authentication & Authorization**: Protected routes with middleware
+- **Input Validation**: Comprehensive validation for polls and votes
+- **Authorization Checks**: Users can only modify their own polls
+- **Admin Protection**: Admin panel requires proper authorization
+- **Vote Protection**: Prevents duplicate voting and validates option bounds
+- **Environment Security**: Sensitive credentials are not committed to version control
 
 ## Testing
 - To run tests (if available):
